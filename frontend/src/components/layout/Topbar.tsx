@@ -100,7 +100,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onMenuToggle }) => {
             ) : (
               <>
                 <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
-                Run FreshGuard Analysis
+                Run Fresh Orbit Analysis
               </>
             )}
           </button>

@@ -79,7 +79,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
           </div>
           <div>
             <span className="font-bold text-white text-base tracking-tight block leading-tight">
-              FreshGuard AI
+              Fresh Orbit
             </span>
             <span className="text-[11px] text-emerald-400 font-medium">Perishable Risk Ops</span>
           </div>

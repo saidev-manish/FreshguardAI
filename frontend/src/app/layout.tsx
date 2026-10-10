@@ -4,7 +4,7 @@ import { AppProvider } from '../context/AppContext';
 import { AppLayout } from '../components/layout/AppLayout';
 
 export const metadata: Metadata = {
-  title: 'FreshGuard AI — Perishable Demand & Risk Support',
+  title: 'Fresh Orbit — Perishable Demand & Risk Support',
   description: 'Agentic decision support for grocery store perishable demand forecasting and shelf-life risk management.'
 };
 

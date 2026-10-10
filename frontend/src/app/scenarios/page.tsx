@@ -79,7 +79,7 @@ export default function ScenarioComparisonPage() {
     <div className="space-y-6">
       <PageHeader
         title="Scenario Comparison & Impact Benchmark"
-        description="Side-by-side evaluation benchmarking traditional static retail rules against the FreshGuard AI Multi-Agent Coordinator on identical scenario cohorts."
+        description="Side-by-side evaluation benchmarking traditional static retail rules against the Fresh Orbit Multi-Agent Coordinator on identical scenario cohorts."
         badge={
           isLiveMode
             ? evaluationSource === 'LIVE'
@@ -261,7 +261,7 @@ export default function ScenarioComparisonPage() {
         <div className="bg-emerald-950 text-white rounded-xl border border-emerald-800 shadow-md p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-emerald-800/80">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">FreshGuard AI</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Fresh Orbit</span>
               <h3 className="text-base font-bold text-white">Multi-Agent Coordinated Engine</h3>
             </div>
             <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-800 text-emerald-200">

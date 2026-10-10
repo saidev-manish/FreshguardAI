@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import {
@@ -153,7 +153,7 @@ export default function CrowdManagementPage() {
           <BarChart3 className="w-4 h-4 text-violet-600" />
           <h2 className="text-sm font-semibold text-gray-900">Crowd Density Telemetry and Anti-Stampede Slot Pacing</h2>
         </div>
-        <p className="text-xs text-gray-500 mb-4">FreshGuard AI paces customer footfall into 15-30 min staggered reservations while redistributing excess stock across stores.</p>
+        <p className="text-xs text-gray-500 mb-4">Fresh Orbit paces customer footfall into 15-30 min staggered reservations while redistributing excess stock across stores.</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {stores.map((store) => {
             const cfg = statusConfig[store.status as keyof typeof statusConfig];
