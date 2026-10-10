@@ -46,21 +46,16 @@ Base.metadata.create_all(bind=engine)
 seed_database()
 
 app = FastAPI(
-    title="FreshGuard AI Backend Service",
+    title="Fresh Orbit Backend Service",
     description="Agentic Decision Support for Perishable Demand & Shelf-Life Risk Operations",
     version="0.1.0"
 )
 
-# CORS configuration allowing local Next.js frontend
+# CORS configuration allowing local Next.js frontend and deployed Vercel apps
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
