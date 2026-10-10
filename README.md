@@ -21,15 +21,6 @@
 
 ---
 
-## 📌 Executive Summary & Problem Statement
-
-Grocery retailers operate perishable supply chains on razor-thin operating margins. Traditional inventory management systems rely on static threshold rules and manual end-of-day shelf sweeps, resulting in:
-
-- **15–25% avoidable perishable shrinkage and food waste** written off directly against margin.
-- **Suboptimal markdowns** initiated too late in the sales cycle, forcing heavy 50%+ discounts.
-- **Stockout penalties** from uncoordinated store orders that fail to cross-balance excess stock from neighboring locations.
-- **Disconnected systems** where POS, ERP, and WMS data operate in silos without coordinated action.
-
 **Fresh Orbit** bridges this gap with an orchestrated multi-agent engine that monitors SKU-level batch expiry horizons, dynamically balances trade-offs, and provides human planners with explainable, actionable recommendations.
 
 ---
