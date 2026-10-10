@@ -27,6 +27,19 @@ from .schemas import (
     DemandPointSchema
 )
 from .seed import seed_database
+from .agents import Orchestrator
+from .evaluation import run_evaluation
+from .synthetic_data import (
+    get_full_dataset,
+    generate_inventory_snapshot,
+    generate_demand_forecast,
+    generate_sales_history,
+    WEATHER_CALENDAR,
+    EVENTS,
+    PROMOTIONS,
+    SKUS,
+    STORES as SYNTHETIC_STORES,
+)
 
 # Ensure database tables exist and seed initial data on startup
 Base.metadata.create_all(bind=engine)
@@ -939,3 +952,129 @@ def import_data(db: Session = Depends(get_db)):
         "message": "Dataset verified and synced with active catalog.",
         "imported_at": datetime.datetime.utcnow().isoformat() + "Z"
     }
+
+
+# ------------------------------------------------------------------------------
+# 11. POST /agents/run  — Full multi-agent pipeline execution
+# ------------------------------------------------------------------------------
+@app.post("/agents/run")
+def run_agents(
+    store_id: Optional[str] = Query("STORE-01"),
+    product_ids: Optional[str] = Query(None, description="Comma-separated product IDs to scope the run")
+):
+    """
+    Runs the full FreshGuard AI agent pipeline:
+      Demand Agent → Freshness Agent → Replenishment Agent
+      → Markdown Agent → Transfer Agent → Orchestrator
+    Returns ranked action plans for each SKU-store pair.
+    """
+    pid_list = [p.strip() for p in product_ids.split(",")] if product_ids else None
+    orchestrator = Orchestrator()
+    result = orchestrator.run(store_id=store_id, product_ids=pid_list)
+    return result
+
+
+# ------------------------------------------------------------------------------
+# 12. GET /dataset  — Full synthetic dataset
+# ------------------------------------------------------------------------------
+@app.get("/dataset")
+def get_dataset():
+    """Returns the complete synthetic dataset including stores, SKUs,
+    30-day sales history, expiry batches, weather, events, and promotions."""
+    return get_full_dataset()
+
+
+# ------------------------------------------------------------------------------
+# 13. GET /dataset/inventory  — Inventory snapshot for a store
+# ------------------------------------------------------------------------------
+@app.get("/dataset/inventory")
+def get_inventory_snapshot(store_id: str = Query("STORE-01")):
+    """Returns the current synthetic inventory snapshot for a given store."""
+    valid_ids = [s["store_id"] for s in SYNTHETIC_STORES]
+    if store_id not in valid_ids:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Store '{store_id}' not found. Valid IDs: {valid_ids}"
+        )
+    return {
+        "store_id": store_id,
+        "snapshot_date": datetime.date.today().isoformat(),
+        "items": generate_inventory_snapshot(store_id)
+    }
+
+
+# ------------------------------------------------------------------------------
+# 14. GET /dataset/forecast  — Demand forecast for a product
+# ------------------------------------------------------------------------------
+@app.get("/dataset/forecast")
+def get_demand_forecast(
+    product_id: str = Query(...),
+    store_id: str = Query("STORE-01"),
+    horizon: int = Query(7, ge=1, le=14),
+):
+    """Returns exponential-smoothing demand forecast with weather/event context."""
+    forecast = generate_demand_forecast(product_id, store_id, horizon_days=horizon)
+    if not forecast:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No forecast data for product '{product_id}' at store '{store_id}'."
+        )
+    history = generate_sales_history(product_id, store_id, days_back=14)
+    return {
+        "product_id": product_id,
+        "store_id": store_id,
+        "horizon_days": horizon,
+        "forecast": forecast,
+        "history_14d": history,
+    }
+
+
+# ------------------------------------------------------------------------------
+# 15. GET /dataset/weather  — Weather calendar
+# ------------------------------------------------------------------------------
+@app.get("/dataset/weather")
+def get_weather_calendar():
+    """Returns the 30-day historical + 7-day forecast weather signal calendar."""
+    return {
+        "calendar": sorted(WEATHER_CALENDAR.values(), key=lambda w: w["date"]),
+        "events": EVENTS,
+    }
+
+
+# ------------------------------------------------------------------------------
+# 16. POST /evaluation/live  — Live agent-vs-baseline evaluation
+# ------------------------------------------------------------------------------
+@app.post("/evaluation/live")
+def run_live_evaluation(
+    store_id: str = Query("STORE-01"),
+):
+    """
+    Runs a real-time evaluation comparing FreshGuard AI multi-agent
+    recommendations against the simple rule-based baseline for a store.
+    Returns structured metrics: waste, margin, stockouts, MAE.
+    """
+    valid_ids = [s["store_id"] for s in SYNTHETIC_STORES]
+    if store_id not in valid_ids:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Store '{store_id}' not found. Valid IDs: {valid_ids}"
+        )
+    return run_evaluation(store_id)
+
+
+# ------------------------------------------------------------------------------
+# 17. GET /dataset/stores  — Synthetic store catalog with metadata
+# ------------------------------------------------------------------------------
+@app.get("/dataset/stores")
+def get_synthetic_stores():
+    """Returns the enriched synthetic store catalog with capacity and footfall data."""
+    return {"stores": SYNTHETIC_STORES}
+
+
+# ------------------------------------------------------------------------------
+# 18. GET /dataset/skus  — Full SKU catalog with velocity metadata
+# ------------------------------------------------------------------------------
+@app.get("/dataset/skus")
+def get_sku_catalog():
+    """Returns all 15 SKUs with velocity, shelf-life, and sensitivity metadata."""
+    return {"skus": SKUS, "count": len(SKUS)}

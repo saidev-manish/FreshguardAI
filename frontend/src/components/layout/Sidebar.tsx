@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   Building2,
   Database,
-  X
+  X,
+  Users2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -59,6 +60,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
       href: '/audit',
       icon: History,
       active: pathname.startsWith('/audit')
+    },
+    {
+      label: 'Crowd Management',
+      href: '/crowd',
+      icon: Users2,
+      active: pathname.startsWith('/crowd')
     }
   ];
 
